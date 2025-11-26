@@ -1,41 +1,32 @@
-<?php  //Start the Session
+<?php
+session_start(); // Always start session at the top
 require('dbconnect.php');
 
-if (isset($_POST['stdNo']) and isset($_POST['noic'])){
-//3.1.1 Assigning posted values to variables.
+if (isset($_POST['stdNo'], $_POST['noic'])) {
+
     $userID = $_POST['stdNo'];
     $password = $_POST['noic'];
 
-//3.1.2 Checking the values are existing in the database or not
-    $query = "SELECT * FROM `student` WHERE stdNo='$userID' and noic='$password'";
+    // Prepare statement
+    $stmt = $connection->prepare("SELECT stdNo, noic FROM student WHERE stdNo = ? AND noic = ?");
+    $stmt->bind_param("ss", $userID, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    $result = mysqli_query($connection, $query) or die(mysqli_error($connection));
-    $count = mysqli_num_rows($result);
-    
-//3.1.2 If the posted values are equal to the database values, then session will be created for the user.
-    if ($count == 1){
-		session_start();
-    $_SESSION['username'] = $userID;
-		$_SESSION['password'] = $password;
-		$_SESSION["loggedin"] = true;
-    }else{
-//3.1.3 If the login credentials doesn't match, he will be shown with an error message.
-        $fmsg = "Invalid Login Credentials.";
+    // Check if login is successful
+    if ($result->num_rows === 1) {
+        $_SESSION['username'] = $userID;
+        $_SESSION["loggedin"] = true;
+
+        echo "<script>document.location = 'main.php';</script>";
+        exit;
+
+    } else {
+        echo "<script>
+                alert('Invalid Login. Please Try Again');
+                document.location = 'index.php';
+              </script>";
+        exit;
     }
 }
-//3.1.4 if the user is logged in Greets the user with message
-if (isset($_SESSION['username'])){
-    echo "<script>
- 					document.location = 'main.php';
-	   				</script>";
-
-}else {
-
-
-    echo "<script>
-					alert('Invalid Login. Please Try Again');
- 					document.location = 'index.php';
-	   				</script>";
-
-}
-    ?>
+?>

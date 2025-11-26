@@ -35,7 +35,7 @@ if (isset($_GET['code'])) {
 
         if (in_array($domain, $allowed)) {
 
-            // Get staffID using email
+            // Get stdNo using email
             $stmt = $connection->prepare("SELECT stdNo FROM student WHERE email_uitm = ? LIMIT 1");
             $stmt->bind_param("s", $email);
             $stmt->execute();
@@ -43,7 +43,7 @@ if (isset($_GET['code'])) {
 
             if ($result->num_rows > 0) {
                 $r = $result->fetch_assoc(); 
-                $staffID = $r['stdNo'];   
+                $stdNo = $r['stdNo'];   
             } else {
                 header("Location: index.php?warning2");
                 exit();
