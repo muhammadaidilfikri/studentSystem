@@ -11,17 +11,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 $ssid = $_SESSION["username"];
 ?>
 
-
-
 <!DOCTYPE html>
-
-<html lang="en" >
+<html lang="en">
 	<!-- begin::Head -->
 	<head>
 		<meta charset="utf-8" />
-		<title>
-			CRS | Club List
-		</title>
+		<title>CRS | Senarai Kelab</title>
 		<meta name="description" content="Latest updates and statistic charts">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -119,7 +114,7 @@ $ssid = $_SESSION["username"];
                           <div class="progress-bar m--bg-brand" role="progressbar" style="width: 100%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="m-widget24__change">
-                          Jumlah Kelab Berdaftar
+                          Kelab Berdaftar
                         </span>
                         <span class="m-widget24__number">
                           100%
@@ -146,7 +141,7 @@ $ssid = $_SESSION["username"];
                           <div class="progress-bar m--bg-info" role="progressbar" style="width: 100%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="m-widget24__change">
-                          Jumlah Penasihat Berdaftar
+                          Penasihat Berdaftar
                         </span>
                         <span class="m-widget24__number">
                           100%
@@ -163,7 +158,7 @@ $ssid = $_SESSION["username"];
                           Pelajar</h4>
                         <br>
                         <span class="m-widget24__desc">
-                          Jumlah Pelajar ditawarkan</span>
+                          Jumlah Pelajar Ditawarkan</span>
                         <span class="m-widget24__stats m--font-danger">
                           <?php echo countStudent() ?>
                         </span>
@@ -172,7 +167,7 @@ $ssid = $_SESSION["username"];
                           <div class="progress-bar m--bg-danger" role="progressbar" style="width: 89%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="m-widget24__change">
-                          Jumlah Pelajar berdaftar
+                          Jumlah Pelajar Berdaftar
                         </span>
                         <span class="m-widget24__number">
                           89%
@@ -186,23 +181,26 @@ $ssid = $_SESSION["username"];
                     <div class="m-widget24">
                       <div class="m-widget24__item">
                         <h4 class="m-widget24__title">
-                          Pendaftaran
+                          Pendaftaran Kelab
                         </h4>
                         <br>
                         <span class="m-widget24__desc">
-                          Jumlah Pelajar Mendaftar Kelab
+                          Jumlah Pelajar Berdaftar
                         </span>
                         <span class="m-widget24__stats m--font-success">
-                          <?php echo countStudentRegistered(); ?>
+                          <?php echo countStudentRegistered() ?>
                         </span>
+                        <div class="m--space-10"></div>
                         <div class="progress m-progress--sm">
                           <div class="progress-bar m--bg-success" role="progressbar" style="width: 2%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <span class="m-widget24__change">
-                        Jumlah Keahlian yang dibuka
+                          Jumlah Kekosongan
                         </span>
                         <span class="m-widget24__number">
-                          <?php echo countMaxPax(); ?>
+                          <?php $tot = countClub()*50;
+                            echo $tot;
+                           ?>
                         </span>
                       </div>
                     </div>
@@ -215,149 +213,121 @@ $ssid = $_SESSION["username"];
               </div>
             </div>
 
-            <!-- begin section -->
-          <div class="m-portlet m-portlet--mobile">
-            <div class="m-portlet__head">
-              <div class="m-portlet__head-caption">
-                <div class="m-portlet__head-title">
-                  <h3 class="m-portlet__head-text">
-                    Pendaftaran Kelab / Persatuan
-                  </h3>
+            <!-- BAHAGIAN PENDAFTARAN PELAJAR -->
+            <div class="m-portlet m-portlet--mobile" style="margin-top: 30px;">
+                <div class="m-portlet__head">
+                    <div class="m-portlet__head-caption">
+                        <div class="m-portlet__head-title">
+                            <h3 class="m-portlet__head-text">
+                                Pendaftaran Kelab Pelajar
+                            </h3>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="m-portlet__head-tools">
-                <ul class="m-portlet__nav">
-                  <li class="m-portlet__nav-item">
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="m-portlet__body">
+                <div class="m-portlet__body">
+                    <?php
+                    $query = "SELECT * FROM club_registration WHERE stdNo='$ssid'";
+                    $result = $mysqli->query($query);
+                    
+                    if (mysqli_num_rows($result) == 0) {
+                        ?>
+                        <div class="alert alert-info">
+                            <strong>Pemakluman Penting:</strong> Pelajar TIDAK DIBENARKAN untuk menukar Kelab selepas pendaftaran. 
+                            Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan untuk menukar Kelab.
+                        </div>
+                        <div class="table-responsive-container">
+                            <table class="table table-striped table-bordered table-hover table-checkable" id="student_registration_table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Kelab</th>
+                                        <th>Nama Penasihat</th>
+                                        <th>Jumlah Maksimum Ahli</th>
+                                        <th>Pelajar Berdaftar</th>
+                                        <th>Kekosongan</th>
+                                        <th>Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $sql_events = mysqli_query($connection, "SELECT * FROM club WHERE club_stat='e' ORDER BY club_name ASC") or die (mysqli_error());
+                                    $z = 1;
 
-              <!--begin: Datatable -->
-															
-							<?php
-							$query = "select * from club_registration where stdNo='$ssid' ";
-							$result = $mysqli->query($query);
-							if (mysqli_num_rows($result)==0) {
-								?>
-              <table class="table table-striped- table-bordered table-hover table-checkable" id="m_table_1">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nama Kelab / Persatuan</th>
-                    <th>Nama Penasihat</th>
-                    <th>Jumlah Maksimum Ahli</th>
-                    <th>Jumlah Mendaftar</th>
-                    <th>Tetapan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php
-                  $sql_events = mysqli_query($connection, "select * from club  where club_stat='e' order by club_name asc ") or die (mysqli_error());
-                  $z =1;
-
-                  while ($row = mysqli_fetch_array($sql_events)) {
-
-                    $club_id = $row["club_id"];
-                    $club_name = $row["club_name"];
-                    $club_max = $row["club_max"];
-                  ?>
-                  <tr>
-                    <th scope="row"><?php echo $z ?></th>
-
-                    <td><?php echo $club_name ?></td>
-                    <td><?php echo senaraiPenasihat($club_id)?></td>
-                    <td><?php echo $club_max ?></td>
-                    <td> <?php echo countClubRegistration($club_id) ?> </td>
-                    <td>
-                       
+                                    while ($row = mysqli_fetch_array($sql_events)) {
+                                        $club_id = $row["club_id"];
+                                        $club_name = $row["club_name"];
+                                        $club_max = $row["club_max"];
+                                        $current_registered = countClubRegistration($club_id);
+                                        $available_slots = $club_max - $current_registered;
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $z ?></td>
+                                        <td><?php echo $club_name ?></td>
+                                        <td><?php echo senaraiPenasihat($club_id) ?></td>
+                                        <td><?php echo $club_max ?></td>
+                                        <td><?php echo $current_registered ?></td>
+                                        <td>
+                                            <?php 
+                                            if ($available_slots > 0) {
+                                                echo '<span class="m-badge m-badge--success m-badge--wide">' . $available_slots . ' kekosongan</span>';
+                                            } else {
+                                                echo '<span class="m-badge m-badge--danger m-badge--wide">Penuh</span>';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            if ($available_slots > 0) {
+                                                ?>
+                                                <a href="regClub.php?club_id=<?php echo $club_id ?>&uid=<?php echo $ssid ?>" 
+                                                   class="btn btn-info m-btn m-btn--icon" 
+                                                   onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab selepas pendaftaran. Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan untuk menukar Kelab. Adakah anda ingin meneruskan proses pendaftaran?')">
+                                                    <span>
+                                                        <i class="fa flaticon-edit"></i>
+                                                        <span>Daftar Kelab</span>
+                                                    </span>
+                                                </a>
+                                                <?php
+                                            } else {
+                                                ?>
+                                                <button type="button" class="btn btn-danger m-btn m-btn--icon" disabled>
+                                                    <i class="la la-minus"></i> Pendaftaran Penuh
+                                                </button>
+                                                <?php
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                    $z++;
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
                         <?php
-                        if 
-						(countClubRegistration($club_id)< $club_max)
-
-                      {
+                    } else {
+                        // Pelajar sudah berdaftar
+                        $registered_club = mysqli_fetch_assoc($result);
+                        $club_id = $registered_club['club_id'];
+                        $club_name_query = mysqli_query($connection, "SELECT club_name FROM club WHERE club_id='$club_id'");
+                        $club_name_row = mysqli_fetch_assoc($club_name_query);
                         ?>
-                        <a href="regClub.php?club_id=<?php echo $club_id ?>&amp;uid=<?php echo $ssid ?>" class="btn btn-info m-btn btn-sm 	m-btn m-btn--icon" onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab / Persatuan setelah mendaftar./n Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan yntuk menukar Kelab / Persatuan. Adakah anda ingin meneruskan proses mendaftar? ')">
-                          <span>
-                            <i class="fa flaticon-edit"></i>
-                            <span>Daftar Kelab</span>
-                          </span>
-                        </a>
-                      <?php
-                      }
-                      else{
-                        ?>
-                        <button type="button" class="btn btn-danger m-btn btn-sm 	m-btn m-btn--icon"><i class="la la-minus"></i> Pendaftaran Penuh</button>
-                      <?php
-                      } 
-                   ?>
-                    </td>
-
-                  </tr>
-				  
-		   										
-                  <?php
-                  $z++;
-								?>
-								<div class="modal fade" id="m_modal_add" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-lg" role="document">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h1 class="modal-title" id="addModal"><?php echo $club_name ?> Pemakluman Penting Pendaftaran Kelab / Persatuan</h1>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<div class="modal-body">
-												<form action="regClub.php" method="post">
-												<input type="hidden" id="club_id" name="club_id" value="<?php echo $club_id ?>">
-												<input type="hidden" id="ssid" name="ssid" value="<?php echo $ssid ?>">
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-												<button type="submit" class="btn btn-primary">Saya faham dan ingin meneruskan pendaftaran</button>
-											</div>
-												</form>
-										</div>
-									</div>
-								</div>
-
-								<?php
-                }
-                ?>
-
-
-                </tbody>
-              </table>
-							<?php
-						}
-						else {
-							$sql_events2 = mysqli_query($connection, "select * from club_registration,club where club.club_id=club_registration.club_id and stdNo='$ssid' ") or die (mysqli_error());
-							while ($row = mysqli_fetch_array($sql_events2)) {
-								$club_id = $row["club_id"];
-								$club_name = $row["club_name"];
-								?>
-								<p>Anda telah mendaftar Kelab / Persatuan <b><?php echo $club_name?></b></p>
-								<?php
-
-						}
-						}
-						?>
+                        <div class="alert alert-info" role="alert">
+                            <h4 class="alert-heading">Telah Berdaftar</h4>
+                            <p>Anda telah mendaftar untuk kelab: <b><?php echo $club_name_row['club_name'] ?></b></p>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
             </div>
-          </div>
-            <!-- end section -->
+            <!-- TAMAT BAHAGIAN PENDAFTARAN PELAJAR -->
+
           </div>
 
 				</div>
 			</div>
-
-      <!--begin::Add Modal-->
-
-
-      <!--end::Modal-->
-
-
 
 			<!-- end:: Body -->
     <?php include("footer.php"); ?>
@@ -376,8 +346,15 @@ $ssid = $_SESSION["username"];
 
     <script>
     $(document).ready( function () {
-    $('#m_table_1').DataTable();
-      } );
+        // Initialize DataTable
+        $('#student_registration_table').DataTable({
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true
+        });
+    } );
     </script>
 
 	</body>

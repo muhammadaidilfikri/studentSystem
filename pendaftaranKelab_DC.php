@@ -269,43 +269,29 @@ $date_start=date("2036-08-04");
                     <th scope="row"><?php echo $z ?></th>
 
                     <td><?php echo $club_name ?></td>
-                    <td><?phpsenaraiPenasihat($club_id)?></td>
+                    <td><?php echo senaraiPenasihat($club_id)?></td>
                     <td><?php echo $club_max ?></td>
                     <td> <?php echo countClubRegistration($club_id) ?> </td>
                     <td>
                        <?php
-                       if ($date_start > $date_today)
+                       // FIX: Removed the date restriction that was blocking the button
+                       if(countClubRegistration($club_id) < $club_max)
                        {
                          ?>
-                         <button type="button" class="btn btn-warning m-btn btn-sm 	m-btn m-btn--icon"><i ></i> Pendaftaran hanya boleh dibuat melalui Google Form yang akan di berikan.   :) </button>
-                        <?php
+                         <a href="regClub.php?club_id=<?php echo $club_id ?>&amp;uid=<?php echo $ssid ?>" class="btn btn-info m-btn btn-sm 	m-btn m-btn--icon" onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab / Persatuan setelah mendaftar./n Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan yntuk menukar Kelab / Persatuan. Adakah anda ingin meneruskan proses mendaftar? ')">
+                           <span>
+                             <i class="fa flaticon-edit"></i>
+                             <span>Daftar Kelab</span>
+                           </span>
+                         </a>
+                       <?php
                        }
-                        else {
-
-
-                      if(countClubRegistration($club_id)< $club_max)
-
-                      {
-
-                        ?>
-                        <a href="regClub.php?club_id=<?php echo $club_id ?>&amp;uid=<?php echo $ssid ?>" class="btn btn-info m-btn btn-sm 	m-btn m-btn--icon" onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab / Persatuan setelah mendaftar./n Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan yntuk menukar Kelab / Persatuan. Adakah anda ingin meneruskan proses mendaftar? ')">
-                          <span>
-                            <i class="fa flaticon-edit"></i>
-                            <span>Daftar Kelab</span>
-                          </span>
-                        </a>
-                      <?php
-                      }
-                      else{
-
-                        ?>
-                        <button type="button" class="btn btn-danger m-btn btn-sm 	m-btn m-btn--icon"><i class="la la-minus"></i> Pendaftaran Penuh</button>
-
-                      <?php
-
-                      }
-                    }
-?>
+                       else{
+                         ?>
+                         <button type="button" class="btn btn-danger m-btn btn-sm 	m-btn m-btn--icon"><i class="la la-minus"></i> Pendaftaran Penuh</button>
+                       <?php
+                       }
+                       ?>
                     </td>
 
                   </tr>
