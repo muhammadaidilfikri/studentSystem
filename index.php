@@ -1,11 +1,76 @@
 <?php
+session_start();
+require('dbconnect.php');
+require_once 'google-api/vendor/autoload.php';
 
-//$session_start();
+$client = new Google_Client();
+$client->setClientId('YOUR_CLIENT_ID');
+$client->setClientSecret('YOUR_CLIENT_SECRET');
+$host = $_SERVER['HTTP_HOST'];
+if ($host === 'localhost') {
+    $client->setRedirectUri('http://localhost/studentSystem/index.php');
+}
+
+$client->addScope('email');
+$client->addScope('profile');
+$client->setPrompt('consent');
+$client->setPrompt('select_account');
+$login_url = $client->createAuthUrl();
+
+if (isset($_GET['code'])) {
+    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    if (!isset($token['error'])) {
+        $client->setAccessToken($token['access_token']);
+        $google_oauth = new Google_Service_Oauth2($client);
+        $google_account_info = $google_oauth->userinfo->get();
+
+        $googleid = $google_account_info->id;
+        $email = $google_account_info->email;
+        $stdName = $google_account_info->name;
+        $profile_pic = $google_account_info->picture;
+
+        // Allowed domain only
+        $allowed = ['uitm.edu.my', 'student.uitm.edu.my'];
+        $domain = substr(strrchr($email, "@"), 1);
+
+        if (in_array($domain, $allowed)) {
+
+            // Get stdNo using email
+            $stmt = $connection->prepare("SELECT stdNo FROM student WHERE email_uitm = ? LIMIT 1");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $r = $result->fetch_assoc(); 
+                $stdNo = $r['stdNo'];   
+            } else {
+                header("Location: index.php?warning2");
+                exit();
+            }
+            $stmt->close();
+
+            $_SESSION["loggedin"] = true;
+            $_SESSION['username'] = $stdNo;
+            $_SESSION['email_uitm'] = $email;   
+            $_SESSION['nama'] = $stdName;
+            $_SESSION['profile_pic'] = $profile_pic;
+
+            header('Location: main.php');
+            exit();
+        } else {
+            header("Location: index.php?warning2");
+            exit();
+        }
+    } else {
+        echo "Error fetching access token.";
+        exit();
+    }
+}
 
 ?>
 
 <!DOCTYPE html>
-
 <html lang="en" >
     <!-- begin::Head -->
     <head>
@@ -63,7 +128,7 @@
 				<div class="m-login__head">
 					<h3 class="m-login__title">Student Login</h3>
 				</div>
-				<form class="m-login__form m-form" action="checkLogin.php" method="post">
+				    <form class="m-login__form m-form" action="checkLogin.php" method="post" style="margin-bottom: 10px;">
 					<div class="form-group m-form__group">
 						<input class="form-control m-input"   type="text" placeholder="Student ID" name="stdNo" autocomplete="off">
 					</div>
@@ -72,9 +137,19 @@
 					</div>
 
 					<div class="m-login__form-action">
-						<button id="m_login_signin_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">Sign In</button>
+						<button id="m_login_signin_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary" style="width: 50%; padding: 10px 0; font-size: 13px;">
+						Sign In</button>
 					</div>
 				</form>
+
+				    <!-- Google Login -->
+                    <div class="m-login__form-action text-center" style="margin-top: 15px;">
+                        <a href="<?php echo htmlspecialchars($login_url); ?>" 
+                        class="btn btn-danger m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn"
+                        style="width: 50%; padding: 10px 0; font-size: 13px;">
+                        Login with Google
+                        </a>
+                    </div>
 
 			<div class="m-login__account">
 				<span class="m-login__account-msg">

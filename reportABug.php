@@ -2,7 +2,7 @@
 
 session_start();
 include ("dbconnect.php");
-include ("addScript.php")
+include ("addScript.php");
 
 ?>
 
@@ -42,7 +42,7 @@ include ("addScript.php")
 		<!-- begin:: Page -->
 		<div class="m-grid m-grid--hor m-grid--root m-page">
 			<!-- BEGIN: Header -->
-			<? include ("menuheader.php")?>
+			<?php include ("menuheader.php")?>
 			<!-- END: Header -->
 		<!-- begin::Body -->
 			<div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
@@ -50,7 +50,7 @@ include ("addScript.php")
 				<button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
 					<i class="la la-close"></i>
 				</button>
-				<? include ("mainmenu.php")?>
+				<?php include ("mainmenu.php")?>
 				<!-- END: Left Aside -->
 				<div class="m-grid__item m-grid__item--fluid m-wrapper">
 					<!-- BEGIN: Subheader -->
@@ -113,7 +113,8 @@ include ("addScript.php")
 										<div class="m-portlet__foot m-portlet__foot--fit">
 											<div class="m-form__actions">
 												<button type="submit" class="btn btn-accent">Send </button>
-												<button type="reset" class="btn btn-secondary">Cancel</button>
+												<button type="button" onclick="window.location.href='main.php'"
+                                                    class="btn btn-secondary">Cancel</button>
 											</div>
 										</div>
 									</form>
