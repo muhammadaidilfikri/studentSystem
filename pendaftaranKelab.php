@@ -269,9 +269,9 @@ $ssid = $_SESSION["username"];
                                         <td>
                                             <?php 
                                             if ($available_slots > 0) {
-                                                echo '<span class="m-badge m-badge--success m-badge--wide">' . $available_slots . ' kekosongan</span>';
+                                                echo '<span class="m-badge m-badge--success" style="font-size: 11px; padding: 2px 6px; line-height: 1.3; width: 80px; display: inline-block; text-align: center;">' . $available_slots . ' kekosongan</span>';
                                             } else {
-                                                echo '<span class="m-badge m-badge--danger m-badge--wide">Penuh</span>';
+                                                echo '<span class="m-badge m-badge--danger" style="font-size: 11px; padding: 2px 6px; line-height: 1.3; width: 80px; display: inline-block; text-align: center;">Penuh</span>';
                                             }
                                             ?>
                                         </td>
@@ -280,18 +280,23 @@ $ssid = $_SESSION["username"];
                                             if ($available_slots > 0) {
                                                 ?>
                                                 <a href="regClub.php?club_id=<?php echo $club_id ?>&uid=<?php echo $ssid ?>" 
-                                                   class="btn btn-info m-btn m-btn--icon" 
-                                                   onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab selepas pendaftaran. Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan untuk menukar Kelab. Adakah anda ingin meneruskan proses pendaftaran?')">
-                                                    <span>
-                                                        <i class="fa flaticon-edit"></i>
+                                                  class="btn m-btn m-btn--icon" 
+                                                  style="width: 115px; min-width: 115px; height: 32px; display: flex; justify-content: center; align-items: center; font-size: 11px; padding: 0 8px; background: #10B981; border-color: #10B981; color: white;"
+                                                  onclick="return confirm('Pelajar TIDAK DIBENARKAN untuk menukar Kelab selepas pendaftaran. Bahagian Hal Ehwal Pelajar tidak akan melayan sebarang permohonan untuk menukar Kelab. Adakah anda ingin meneruskan proses pendaftaran?')">
+                                                    <span style="display: flex; align-items: center; gap: 5px;">
+                                                        <i class="fa flaticon-edit" style="font-size: 12px;"></i>
                                                         <span>Daftar Kelab</span>
                                                     </span>
                                                 </a>
                                                 <?php
                                             } else {
                                                 ?>
-                                                <button type="button" class="btn btn-danger m-btn m-btn--icon" disabled>
-                                                    <i class="la la-minus"></i> Pendaftaran Penuh
+                                                <button type="button" class="btn m-btn m-btn--icon" disabled 
+                                                        style="width: 115px; min-width: 115px; height: 32px; display: flex; justify-content: center; align-items: center; font-size: 11px; padding: 0 8px; background: #6b706eff; border-color: #6b706eff; color: white;">
+                                                    <span style="display: flex; align-items: center; gap: 5px;">
+                                                        <i class="la la-minus" style="font-size: 12px;"></i>
+                                                        <span>Penuh</span>
+                                                    </span>
                                                 </button>
                                                 <?php
                                             }
