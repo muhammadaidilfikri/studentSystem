@@ -1,4 +1,5 @@
 <?php
+//test
 session_start();
 include("dbconnect.php");
 include("iqfunction.php");
@@ -256,7 +257,7 @@ $ssid = $_SESSION["username"];
         $stmt->close();
         ?>
         </tbody>
-    </table>
+    </table>     
 
     <h4>Aktiviti Pusat Asasi</h4>
 
