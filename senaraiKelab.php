@@ -21,7 +21,7 @@ $ssid = $_SESSION["username"];
 	<head>
 		<meta charset="utf-8" />
 		<title>
-			CRS | Club List
+			AsidApps | Club List
 		</title>
 		<meta name="description" content="Latest updates and statistic charts">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">

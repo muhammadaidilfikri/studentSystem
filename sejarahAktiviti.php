@@ -13,7 +13,6 @@ $ssid = $_SESSION["username"];
 ?>
 
 
-
 <!DOCTYPE html>
 
 <html lang="en" >
@@ -21,7 +20,7 @@ $ssid = $_SESSION["username"];
 	<head>
 		<meta charset="utf-8" />
 		<title>
-			CRS | Sejarah Penyertaan Aktiviti
+			AsidApps | Sejarah Penyertaan Aktiviti
 		</title>
 		<meta name="description" content="Latest updates and statistic charts">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">

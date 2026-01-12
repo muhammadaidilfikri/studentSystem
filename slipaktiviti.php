@@ -1,5 +1,4 @@
 <?php
-//test
 session_start();
 include("dbconnect.php");
 include("iqfunction.php");
@@ -10,375 +9,357 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 }
 
 $ssid = $_SESSION["username"];
-?>
 
+// Get student info early to use in <title>
+$stmt = $connection->prepare("
+    SELECT stdNo, stdName, progCode, progName, noIc
+    FROM student
+    WHERE stdNo = ?
+");
+$stmt->bind_param("s", $ssid);
+$stmt->execute();
+$student = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
-<!-- begin::Head -->
 <head>
-    <meta charset="utf-8" />
-    <title>CRS | Slip Aktiviti Pelajar</title>
-    <meta name="description" content="Latest updates and statistic charts">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta charset="utf-8">
+<title>AsidApps | <?php echo $student['stdName']; ?> - <?php echo $student['stdNo']; ?></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--begin::Web font -->
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
-    <script>
-        WebFont.load({
-            google: {families: ["Poppins:300,400,500,600,700","Roboto:300,400,500,600,700"]},
-            active: function () {
-                sessionStorage.fonts = true;
-            }
-        });
-    </script>
+<!-- Certificate Fonts -->
+ <link rel="shortcut icon" href="assets/demo/default/media/img/logo/favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: "Roboto", "Poppins", "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            background: #ffffffff;
-        }
+<style>
+body {
+    font-family: "Libre Baskerville", serif;
+    background: #f2f2f2;
+    margin: 0;
+    color: #111;
+}
 
-        .certificate-container {
-            width: 800px;
-            margin: 30px auto;
-            padding: 40px;
-            background: #ffffffff;
-            border: 3px solid #4E2A84;
-            border-radius: 1px;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
-        }
+.print-btn {
+    width: 220px;
+    margin: 25px auto;
+    padding: 12px;
+    text-align: center;
+    background: #471658;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
 
-        h2 {
-            text-align: center;
-            font-family: "Poppins", sans-serif;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
+.print-btn:hover {
+    background: #5A3D8C;
+}
 
-        h4 {
-            margin-top: 40px;
-            font-family: "Poppins", sans-serif;
-            border-bottom: 3px solid #000;
-            width: fit-content;
-            padding-bottom: 4px;
-        }
+/* Certificate container with background logo */
+.certificate-container {
+    position: relative;
+    width: 820px;
+    margin: auto;
+    padding: 50px;
+    background:
+        url("images/logo_uitm.png") center center / 2300px no-repeat,
+        #FFF8E7;
+    border: 6px double #C9A24D;
+}
 
-        table {
-            width: 100%;
-            margin-top: 15px;
-            border-collapse: collapse;
-        }
+/* Header */
+.header-box {
+    text-align: center;
+}
 
-        table, th, td {
-            border: 2px solid #000;
-        }
+.uitm-logo {
+    width: 300px;
+}
 
-        th, td {
-            padding: 6px 8px;
-            font-size: 12px;
-            text-align: center;
-        }
+.cert-title {
+    font-family: "Cinzel", serif;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin: 25px 0 10px;
+    text-transform: uppercase;
+    color: #8A6E2F;
+}
 
-        th {
-            background: #e3e3e3;
-            font-weight: bold;
-        }
+.sub-title {
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 35px;
+}
 
-        /* PRINT BUTTON */
-        .print-btn {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 12px;
-            text-align: center;
-            background: #76d2f9;
-            color: white;
-            font-size: 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            cursor: pointer;
-        }
+/* Student name */
+.student-center {
+    text-align: center;
+    margin-bottom: 30px;
+}
 
-        .print-btn:hover {
-            background: #4a89e1;
-        }
+.student-center .label {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
 
-        /* PRINT ONLY CERTIFICATE */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .certificate-container, .certificate-container * {
-                visibility: visible;
-            }
-            .print-btn {
-                display: none;
-            }
-        }
+.student-center .name {
+    font-family: "Cinzel", serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #C9A24D;
+}
 
-        /* HEADER SECTION */
-        .header-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* Student info */
+.student-info {
+    font-size: 13px;
+    margin-bottom: 35px;
+}
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+.student-info div {
+    margin: 6px 0;
+}
 
-        .uitm-logo {
-            width: 250px;
-        }
+/* Section titles */
+.section-title {
+    text-align: center;
+    font-family: "Cinzel", serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 35px 0 15px;
+    text-transform: uppercase;
+    color: #8A6E2F;
+}
 
-        .header-right {
-            font-size: 16px;
-            font-weight: bold;
-            font-family: "Poppins", sans-serif;
-        }
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+}
 
-        .gold-line {
-            border: none;
-            height: 4px;
-            background: #D4AF37;
-            margin-top: 10px;
-            margin-bottom: 25px;
-        }
-    </style>
-    <link rel="shortcut icon" href="assets/demo/default/media/img/logo/favicon.ico" />
+.result-table th,
+.result-table td {
+    padding: 8px 6px;
+}
 
-    <script>
-        function printCertificate() {
-            window.print();
-        }
-    </script>
+.result-table thead th {
+    border-bottom: 2px solid #C9A24D;
+    text-align: center;
+    font-weight: 700;
+    color: #8A6E2F;
+}
+
+.result-table tbody td {
+    border-bottom: 1px solid #E6D8A8;
+}
+
+.center {
+    text-align: center;
+}
+
+/* Total summary */
+.total-box {
+    margin-top: 30px;
+    font-family: "Cinzel", serif;
+    font-size: 14px;
+}
+
+.total-box div {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+}
+
+.total-final {
+    font-size: 18px;
+    font-weight: 700;
+    border-top: 2px solid #C9A24D;
+    padding-top: 10px;
+    margin-top: 12px;
+    color: #8A6E2F;
+}
+
+@media print {
+    body * { visibility: hidden; }
+    .certificate-container,
+    .certificate-container * { visibility: visible; }
+    .print-btn { display: none; }
+}
+</style>
+
+<script>
+function printCertificate() {
+    window.print();
+}
+</script>
 </head>
 
 <body>
 
-<a class="print-btn" onclick="printCertificate()">🖨 Print / Save as PDF</a>
+<div class="print-btn" onclick="printCertificate()">🖶 Print / Save as PDF</div>
 
 <div class="certificate-container">
 
-    <div class="header-box">
-        <div class="header-left">
-            <img src="images/uitm-logo.png" class="uitm-logo">
-        </div>
-        <div class="header-right">
-            <b>LAPORAN AKTIVITI PELAJAR</b>
-        </div>
-    </div>
-
-    <hr class="gold-line">
-
-    <?php
-    $stmt = $connection->prepare("
-        SELECT stdNo, stdName, progCode, progName, noIc 
-        FROM student 
-        WHERE stdNo = ?
-    ");
-    $stmt->bind_param("s", $ssid);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-    $stdNo = $row['stdNo'];
-    $stdName = $row['stdName'];
-    $progCode = $row['progCode'];
-    $progName = $row['progName'];
-    $noIc = $row['noIc'];
-
-    $stmt->close();
-
-    ?>
-
-    <div style="text-align: left; font-family: Helvetica Neue, arial; font-size: 13px; line-height: 1.5;">
-        <div><b>Nama :</b> <?php echo $stdName ?></div>
-        <div><b>No Pelajar :</b> <?php echo $stdNo ?></div>
-        <div><b>Program :</b> (<?php echo $progCode ?>) <?php echo $progName ?></div>
-        <div><b>No IC :</b> <?php echo $noIc ?></div>
-    </div>
-
-    <h4>Aktiviti Kelab Persatuan</h4>
-
-    <table>
-        <thead>
-        <tr>
-            <th>No</th>
-            <th>No Pelajar</th>
-            <th>Nama Aktiviti</th>
-            <th>Tarikh</th>
-            <th>Jenis Penyertaan</th>
-            <th>Markah</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <?php
-        $stmt = $connection->prepare("
-            SELECT a.actreg_id, s.stdNo, c.act_name, c.date_start, a.regpoint
-            FROM actreg a
-            INNER JOIN student s ON s.stdNo = a.stdNo
-            INNER JOIN club_activities c ON c.act_id = a.act_id
-            WHERE s.stdNo = ?
-        ");
-        $stmt->bind_param("s", $ssid);
-        $stmt->execute();
-        $sql_events = $stmt->get_result();
-
-        $z = 1;
-        $totact = 0;
-
-        while ($row = $sql_events->fetch_assoc()) {
-            $actreg_id = $row["actreg_id"];
-            $regs = ($row["regpoint"] == 'a' ? "Audience" :
-                    ($row["regpoint"] == 'p' ? "Contestant" : "Committee"));
-
-            echo "<tr>
-                    <td>{$z}</td>
-                    <td>{$row['stdNo']}</td>
-                    <td>{$row['act_name']}</td>
-                    <td>{$row['date_start']}</td>
-                    <td>{$regs}</td>
-                    <td>".checkMarks($actreg_id)."</td>
-                </tr>";
-
-            $totact += checkMarks($actreg_id);
-            $z++;
-        }
-
-        $stmt->close();
-        ?>
-        </tbody>
-    </table>     
-
-    <h4>Aktiviti Pusat Asasi</h4>
-
-    <table>
-        <thead>
-        <tr>
-            <th>No</th>
-            <th>No Pelajar</th>
-            <th>Nama Aktiviti</th>
-            <th>Tarikh</th>
-            <th>Jenis Penyertaan</th>
-            <th>Markah</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <?php
-        $stmt = $connection->prepare("
-            SELECT d.dactreg_id, s.stdNo, a.dact_name, a.date_start, d.regpoint
-            FROM dactreg d
-            INNER JOIN student s ON s.stdNo = d.stdNo
-            INNER JOIN dept_activities a ON a.dact_id = d.dact_id
-            WHERE s.stdNo = ?
-            ORDER BY d.regpoint DESC
-        ");
-        $stmt->bind_param("s", $ssid);
-        $stmt->execute();
-        $sql_events = $stmt->get_result();
-
-        $z = 1;
-        $totdact = 0;
-
-        while ($row = $sql_events->fetch_assoc()) {
-            $dactreg_id = $row["dactreg_id"];
-            $regs = ($row["regpoint"] == 'a' ? "Audience" :
-                    ($row["regpoint"] == 'p' ? "Contestant" : "Committee"));
-
-            echo "<tr>
-                    <td>{$z}</td>
-                    <td>{$row['stdNo']}</td>
-                    <td>{$row['dact_name']}</td>
-                    <td>{$row['date_start']}</td>
-                    <td>{$regs}</td>
-                    <td>".checkMarksD($dactreg_id)."</td>
-                </tr>";
-
-            $totdact += checkMarksD($dactreg_id);
-            $z++;
-        }
-
-        $stmt->close();
-        ?>
-
-        </tbody>
-    </table>
-
-    <h4>Penyertaan / Komiti / Kelas</h4>
-
-    <table>
-        <thead>
-        <tr>
-            <th>No</th>
-            <th>Komiti / Kelas</th>
-            <th>Markah</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <?php
-        $stmt = $connection->prepare("
-            SELECT m.com_name, m.com_marks 
-            FROM regcom r
-            INNER JOIN com_marks m ON m.com_id = r.com_id
-            WHERE r.stdNo = ?
-        ");
-        $stmt->bind_param("s", $ssid);
-        $stmt->execute();
-        $sql_events = $stmt->get_result();
-
-        $z = 1;
-        $totmarkah = 0;
-
-        while ($row = $sql_events->fetch_assoc()) {
-            $totmarkah += $row["com_marks"];
-
-            echo "<tr>
-                    <td>{$z}</td>
-                    <td>{$row['com_name']}</td>
-                    <td>{$row['com_marks']}</td>
-                </tr>";
-            $z++;
-        }
-
-        $stmt->close();
-        ?>
-        </tbody>
-    </table>
-
-    <h4>Markah Terkumpul</h4>
-
-    <table>
-        <thead>
-        <tr>
-            <th>Markah Aktiviti Persatuan Kelab</th>
-            <th>Markah Aktiviti Pusat Asasi</th>
-            <th>Markah Penyertaan / Komiti / Kelas</th>
-            <th>Jumlah</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr>
-            <td><?php echo $totact ?></td>
-            <td><?php echo $totdact ?></td>
-            <td><?php echo $totmarkah ?></td>
-            <td><b><?php echo $totact + $totdact + $totmarkah ?></b></td>
-        </tr>
-        </tbody>
-    </table>
-
+<div class="header-box">
+    <img src="images/uitm-logo.png" class="uitm-logo">
 </div>
 
+<div class="cert-title">Sijil Rekod Aktiviti Pelajar</div>
+<div class="sub-title">Pusat Asasi UiTM Dengkil</div>
+
+<div class="student-center">
+    <div class="label">Dengan ini diperakui bahawa</div>
+    <div class="name"><?php echo $student['stdName']; ?></div>
+</div>
+
+<div class="student-info">
+    <div><b>No Pelajar</b> : <?php echo $student['stdNo']; ?></div>
+    <div><b>No Kad Pengenalan</b> : <?php echo $student['noIc']; ?></div>
+    <div><b>Program</b> : (<?php echo $student['progCode']; ?>) <?php echo $student['progName']; ?></div>
+</div>
+
+<!-- Aktiviti Kelab -->
+<div class="section-title">Aktiviti Kelab & Persatuan</div>
+<table class="result-table">
+<thead>
+<tr>
+    <th width="5%">Bil</th>
+    <th>Nama Aktiviti</th>
+    <th width="18%">Tarikh</th>
+    <th width="20%">Peranan</th>
+    <th width="12%">Markah</th>
+</tr>
+</thead>
+<tbody>
+<?php
+$stmt = $connection->prepare("
+    SELECT a.actreg_id, c.act_name, c.date_start, a.regpoint
+    FROM actreg a
+    JOIN club_activities c ON c.act_id = a.act_id
+    WHERE a.stdNo = ?
+");
+$stmt->bind_param("s", $ssid);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$bil = 1; $totact = 0;
+while ($r = $res->fetch_assoc()) {
+    $type = ($r['regpoint']=='a'?'Audience':($r['regpoint']=='p'?'Contestant':'Committee'));
+    $mark = checkMarks($r['actreg_id']);
+    $totact += $mark;
+
+    echo "<tr>
+        <td class='center'>{$bil}</td>
+        <td>{$r['act_name']}</td>
+        <td class='center'>{$r['date_start']}</td>
+        <td class='center'>{$type}</td>
+        <td class='center'>{$mark}</td>
+    </tr>";
+    $bil++;
+}
+$stmt->close();
+?>
+</tbody>
+</table>
+
+<!-- Aktiviti Pusat Asasi -->
+<div class="section-title">Aktiviti Pusat Asasi</div>
+<table class="result-table">
+<thead>
+<tr>
+    <th width="5%">Bil</th>
+    <th>Nama Aktiviti</th>
+    <th width="18%">Tarikh</th>
+    <th width="20%">Peranan</th>
+    <th width="12%">Markah</th>
+</tr>
+</thead>
+<tbody>
+<?php
+$stmt = $connection->prepare("
+    SELECT d.dactreg_id, a.dact_name, a.date_start, d.regpoint
+    FROM dactreg d
+    JOIN dept_activities a ON a.dact_id = d.dact_id
+    WHERE d.stdNo = ?
+");
+$stmt->bind_param("s", $ssid);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$bil = 1; $totdact = 0;
+while ($r = $res->fetch_assoc()) {
+    $type = ($r['regpoint']=='a'?'Audience':($r['regpoint']=='p'?'Contestant':'Committee'));
+    $mark = checkMarksD($r['dactreg_id']);
+    $totdact += $mark;
+
+    echo "<tr>
+        <td class='center'>{$bil}</td>
+        <td>{$r['dact_name']}</td>
+        <td class='center'>{$r['date_start']}</td>
+        <td class='center'>{$type}</td>
+        <td class='center'>{$mark}</td>
+    </tr>";
+    $bil++;
+}
+$stmt->close();
+?>
+</tbody>
+</table>
+
+<!-- Penyertaan -->
+<div class="section-title">Penyertaan / Komiti / Kelas</div>
+<table class="result-table">
+<thead>
+<tr>
+    <th width="5%">Bil</th>
+    <th>Komiti / Kelas</th>
+    <th width="15%">Markah</th>
+</tr>
+</thead>
+<tbody>
+<?php
+$stmt = $connection->prepare("
+    SELECT m.com_name, m.com_marks
+    FROM regcom r
+    JOIN com_marks m ON m.com_id = r.com_id
+    WHERE r.stdNo = ?
+");
+$stmt->bind_param("s", $ssid);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$bil = 1; $totmarkah = 0;
+while ($r = $res->fetch_assoc()) {
+    $totmarkah += $r['com_marks'];
+    echo "<tr>
+        <td class='center'>{$bil}</td>
+        <td>{$r['com_name']}</td>
+        <td class='center'>{$r['com_marks']}</td>
+    </tr>";
+    $bil++;
+}
+$stmt->close();
+?>
+</tbody>
+</table>
+
+<!-- Total -->
+<div class="section-title">Markah Terkumpul</div>
+<div class="total-box">
+    <div><span>Kelab & Persatuan</span><span><?php echo $totact; ?></span></div>
+    <div><span>Pusat Asasi</span><span><?php echo $totdact; ?></span></div>
+    <div><span>Penyertaan / Komiti</span><span><?php echo $totmarkah; ?></span></div>
+    <div class="total-final">
+        <span>Jumlah Keseluruhan</span>
+        <span><?php echo $totact + $totdact + $totmarkah; ?></span>
+    </div>
+</div>
+
+</div>
 </body>
 </html>
